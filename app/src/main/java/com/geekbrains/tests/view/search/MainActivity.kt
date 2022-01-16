@@ -36,6 +36,7 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
     private fun setUI() {
         toDetailsActivityButton.setOnClickListener {
             startActivity(DetailsActivity.getIntent(this, totalCount))
+            //presenter.searchGitHub()
         }
         setQueryListener()
         setRecyclerView()
