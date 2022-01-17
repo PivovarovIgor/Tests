@@ -10,7 +10,6 @@ import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.geekbrains.tests.BuildConfig
 import com.geekbrains.tests.R
 import org.hamcrest.CoreMatchers
 import org.hamcrest.Matcher
@@ -59,21 +58,14 @@ class MainActivityTest {
         onView(withId(R.id.toDetailsActivityButton))
             .perform(click())
 
-        if (BuildConfig.FLAVOR == MainActivity.FAKE) {
-            onView(withId(R.id.totalCountTextView))
-                .check(matches(isDisplayed()))
-                .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
-                .check(matches(withText("Number of results: 42")))
-        } else {
-            onView(isRoot()).perform(delay())
-            onView(withId(R.id.totalCountTextView))
-                .check(matches(isDisplayed()))
-                .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
-                .check(matches(withText(CoreMatchers.startsWith("Number of results:"))))
-        }
+        onView(isRoot()).perform(delay())
+        onView(withId(R.id.totalCountTextView))
+            .check(matches(isDisplayed()))
+            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+            .check(matches(withText(CoreMatchers.startsWith("Number of results:"))))
     }
 
-    fun delay(): ViewAction = object : ViewAction {
+    private fun delay(): ViewAction = object : ViewAction {
         override fun getConstraints(): Matcher<View> = isRoot()
 
         override fun getDescription(): String = "wait for 2 seconds"
