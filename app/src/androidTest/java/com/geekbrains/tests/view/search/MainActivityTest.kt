@@ -1,13 +1,19 @@
 package com.geekbrains.tests.view.search
 
+import android.view.View
 import androidx.lifecycle.Lifecycle
 import androidx.test.core.app.ActivityScenario
 import androidx.test.espresso.Espresso.onView
+import androidx.test.espresso.UiController
+import androidx.test.espresso.ViewAction
 import androidx.test.espresso.action.ViewActions.*
 import androidx.test.espresso.assertion.ViewAssertions.matches
 import androidx.test.espresso.matcher.ViewMatchers.*
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.geekbrains.tests.BuildConfig
 import com.geekbrains.tests.R
+import org.hamcrest.CoreMatchers
+import org.hamcrest.Matcher
 import org.junit.After
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -42,16 +48,39 @@ class MainActivityTest {
 
     @Test
     fun activity_type_some_text_and_press_button() {
+        onView(withId(R.id.totalCountTextView))
+            .check(matches(withEffectiveVisibility(Visibility.INVISIBLE)))
         onView(withId(R.id.searchEditText))
             .perform(
                 click(),
-                replaceText("Some text find."),
+                replaceText("Kotlin"),
                 pressImeActionButton()
             )
         onView(withId(R.id.toDetailsActivityButton))
             .perform(click())
-        onView(withId(R.id.totalCountTextView))
-            .check(matches(isDisplayed()))
+
+        if (BuildConfig.FLAVOR == MainActivity.FAKE) {
+            onView(withId(R.id.totalCountTextView))
+                .check(matches(isDisplayed()))
+                .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+                .check(matches(withText("Number of results: 42")))
+        } else {
+            onView(isRoot()).perform(delay())
+            onView(withId(R.id.totalCountTextView))
+                .check(matches(isDisplayed()))
+                .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
+                .check(matches(withText(CoreMatchers.startsWith("Number of results:"))))
+        }
+    }
+
+    fun delay(): ViewAction = object : ViewAction {
+        override fun getConstraints(): Matcher<View> = isRoot()
+
+        override fun getDescription(): String = "wait for 2 seconds"
+
+        override fun perform(uiController: UiController, view: View) {
+            uiController.loopMainThreadForAtLeast(2000L)
+        }
     }
 
     @After
