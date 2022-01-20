@@ -11,6 +11,7 @@ import com.geekbrains.tests.model.SearchResult
 import com.geekbrains.tests.presenter.search.PresenterSearchContract
 import com.geekbrains.tests.presenter.search.SearchPresenter
 import com.geekbrains.tests.repository.RepositoryProvider
+import com.geekbrains.tests.view.details.DetailsActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import java.util.*
 
@@ -28,7 +29,10 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
 
     private fun setUI() {
         toDetailsActivityButton.setOnClickListener {
-            presenter.searchGitHub(searchEditText.text.toString())
+            startActivity(DetailsActivity.getIntent(this, totalCount))
+        }
+        toSearch.setOnClickListener {
+            toSearchByQuery()
         }
         setQueryListener()
         setRecyclerView()
@@ -42,21 +46,25 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
     private fun setQueryListener() {
         searchEditText.setOnEditorActionListener(OnEditorActionListener { _, actionId, _ ->
             if (actionId == EditorInfo.IME_ACTION_SEARCH) {
-                val query = searchEditText.text.toString()
-                if (query.isNotBlank()) {
-                    presenter.searchGitHub(query)
-                    return@OnEditorActionListener true
-                } else {
-                    Toast.makeText(
-                        this@MainActivity,
-                        getString(R.string.enter_search_word),
-                        Toast.LENGTH_SHORT
-                    ).show()
-                    return@OnEditorActionListener false
-                }
+                return@OnEditorActionListener toSearchByQuery()
             }
             false
         })
+    }
+
+    private fun toSearchByQuery(): Boolean {
+        val query = searchEditText.text.toString()
+        return if (query.isNotBlank()) {
+            presenter.searchGitHub(query)
+            true
+        } else {
+            Toast.makeText(
+                this@MainActivity,
+                getString(R.string.enter_search_word),
+                Toast.LENGTH_SHORT
+            ).show()
+            false
+        }
     }
 
     override fun displaySearchResults(

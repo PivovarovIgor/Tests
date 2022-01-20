@@ -1,20 +1,15 @@
 package com.geekbrains.tests.view.search
 
-import android.view.View
-import androidx.lifecycle.Lifecycle
-import androidx.test.core.app.ActivityScenario
-import androidx.test.espresso.Espresso.onView
-import androidx.test.espresso.UiController
-import androidx.test.espresso.ViewAction
-import androidx.test.espresso.action.ViewActions.*
-import androidx.test.espresso.assertion.ViewAssertions.matches
-import androidx.test.espresso.matcher.ViewMatchers.*
+import android.content.Context
+import android.content.Intent
+import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import com.geekbrains.tests.R
-import org.hamcrest.CoreMatchers
-import org.hamcrest.Matcher
-import org.junit.After
-import org.junit.Assert.assertEquals
+import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
+import androidx.test.uiautomator.By
+import androidx.test.uiautomator.UiDevice
+import androidx.test.uiautomator.Until.findObject
+import androidx.test.uiautomator.Until.hasObject
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -22,61 +17,40 @@ import org.junit.runner.RunWith
 @RunWith(AndroidJUnit4::class)
 class MainActivityTest {
 
-    private lateinit var scenario: ActivityScenario<MainActivity>
+    private val uiDevice: UiDevice = UiDevice.getInstance(getInstrumentation())
+    private val context: Context = ApplicationProvider.getApplicationContext()
+    private val packageName = context.packageName
 
     @Before
     fun seUp() {
-        scenario = ActivityScenario.launch(MainActivity::class.java)
+        uiDevice.pressHome()
+        val intent = context.packageManager.getLaunchIntentForPackage(packageName)
+        intent!!.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
+        context.startActivity(intent)
+        uiDevice.wait(hasObject(By.pkg(packageName).depth(0)), TIMEOUT)
     }
 
     @Test
-    fun activity_is_resumed_Test() {
-        assertEquals(scenario.state, Lifecycle.State.RESUMED)
+    fun main_activity_is_started() {
+        val textEdit = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT))
+        assertNotNull(textEdit)
     }
 
     @Test
-    fun activity_all_views_completely_is_displayed() {
-        onView(withId(R.id.searchEditText))
-            .check(matches(isCompletelyDisplayed()))
-            .check(matches(withHint(R.string.search_hint)))
-            .check(matches(isFocused()))
-        onView(withId(R.id.toDetailsActivityButton))
-            .check(matches(isCompletelyDisplayed()))
-            .check(matches(withText(R.string.to_details)))
+    fun search_positive() {
+        val textEdit = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT))
+        textEdit.text = SEARCHING_TEXT
+        val searchButton = uiDevice.findObject(By.text(TEXT_OF_SEARCH_BUTTON))
+        searchButton.click()
+        val result = uiDevice.wait(findObject(By.textStartsWith(START_TEXT_OF_TOTAL_TEXT)), TIMEOUT)
+        assertNotNull(result)
     }
 
-    @Test
-    fun activity_type_some_text_and_press_button() {
-        onView(withId(R.id.totalCountTextView))
-            .check(matches(withEffectiveVisibility(Visibility.INVISIBLE)))
-        onView(withId(R.id.searchEditText))
-            .perform(
-                click(),
-                replaceText("Kotlin"),
-                pressImeActionButton()
-            )
-        onView(withId(R.id.toDetailsActivityButton))
-            .perform(click())
-
-        onView(isRoot()).perform(delay())
-        onView(withId(R.id.totalCountTextView))
-            .check(matches(isDisplayed()))
-            .check(matches(withEffectiveVisibility(Visibility.VISIBLE)))
-            .check(matches(withText(CoreMatchers.startsWith("Number of results:"))))
-    }
-
-    private fun delay(): ViewAction = object : ViewAction {
-        override fun getConstraints(): Matcher<View> = isRoot()
-
-        override fun getDescription(): String = "wait for 2 seconds"
-
-        override fun perform(uiController: UiController, view: View) {
-            uiController.loopMainThreadForAtLeast(2000L)
-        }
-    }
-
-    @After
-    fun close() {
-        scenario.close()
+    companion object {
+        private const val TIMEOUT = 5000L
+        private const val SEARCH_EDIT_TEXT = "searchEditText"
+        private const val TEXT_OF_SEARCH_BUTTON = "to search"
+        private const val START_TEXT_OF_TOTAL_TEXT = "Number of results:"
+        private const val SEARCHING_TEXT = "kotlin"
     }
 }
