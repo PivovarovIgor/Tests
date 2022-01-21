@@ -82,7 +82,7 @@ class MainActivity : AppCompatActivity(), ViewSearchContract {
     }
 
     override fun displayError() {
-        Toast.makeText(this, getString(R.string.undefined_error), Toast.LENGTH_SHORT).show()
+        Toast.makeText(this, getString(R.string.connect_error), Toast.LENGTH_SHORT).show()
     }
 
     override fun displayError(error: String) {

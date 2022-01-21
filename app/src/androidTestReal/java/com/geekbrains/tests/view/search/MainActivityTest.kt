@@ -9,11 +9,11 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until.*
-import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
+import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
+import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
 @SdkSuppress(minSdkVersion = 18)
@@ -34,13 +34,13 @@ class MainActivityTest {
 
     @Test
     fun main_activity_is_started() {
-        val textEdit = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT))
+        val textEdit = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT_ID))
         assertNotNull(textEdit)
     }
 
     @Test
     fun search_positive() {
-        val textEdit = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT))
+        val textEdit = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT_ID))
         textEdit.text = SEARCHING_TEXT
         val searchButton = uiDevice.findObject(By.text(TEXT_OF_SEARCH_BUTTON))
         searchButton.click()
@@ -50,7 +50,7 @@ class MainActivityTest {
 
     @Test
     fun check_equals_count_found_positive() {
-        val textEdit = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT))
+        val textEdit = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT_ID))
         textEdit.text = SEARCHING_TEXT
         val searchButton = uiDevice.findObject(By.text(TEXT_OF_SEARCH_BUTTON))
         searchButton.click()
@@ -60,14 +60,31 @@ class MainActivityTest {
         assertNotNull(textCountResults)
         val toDetailsButton = uiDevice.findObject(By.text(TEXT_OF_TO_DETAILS_BUTTON))
         toDetailsButton.clickAndWait(newWindow(), TIMEOUT)
-        val totalDetails = uiDevice.findObject(By.res(packageName, TOTAL_TEXT_VIEW))
+        val totalDetails = uiDevice.findObject(By.res(packageName, TOTAL_TEXT_VIEW_ID))
         assertEquals(textCountResults, totalDetails.text)
+    }
+
+    @Test
+    @Throws(IOException::class)
+    fun search_negative() {
+        uiDevice.executeShellCommand("svc wifi disable")
+        uiDevice.executeShellCommand("svc data disable")
+
+        val editText = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT_ID))
+        editText.text = SEARCHING_TEXT
+        val buttonFind = uiDevice.findObject(By.text(TEXT_OF_SEARCH_BUTTON))
+        buttonFind.click()
+
+        assertFalse(uiDevice.hasObject(By.textStartsWith(START_TEXT_OF_TOTAL_TEXT)))
+
+        uiDevice.executeShellCommand("svc wifi enable")
+        uiDevice.executeShellCommand("svc data enable")
     }
 
     companion object {
         private const val TIMEOUT = 5000L
-        private const val SEARCH_EDIT_TEXT = "searchEditText"
-        private const val TOTAL_TEXT_VIEW = "totalCountTextView"
+        private const val SEARCH_EDIT_TEXT_ID = "searchEditText"
+        private const val TOTAL_TEXT_VIEW_ID = "totalCountTextView"
         private const val TEXT_OF_SEARCH_BUTTON = "to search"
         private const val TEXT_OF_TO_DETAILS_BUTTON = "to details"
         private const val START_TEXT_OF_TOTAL_TEXT = "Number of results:"
