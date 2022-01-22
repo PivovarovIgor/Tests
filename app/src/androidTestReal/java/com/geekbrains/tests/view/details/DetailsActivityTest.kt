@@ -9,8 +9,9 @@ import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until.hasObject
 import androidx.test.uiautomator.Until.newWindow
-import org.junit.Assert.*
-
+import com.geekbrains.tests.*
+import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -46,13 +47,5 @@ class DetailsActivityTest {
         assertEquals(totalCountTextView.text, "Number of results: 1")
         decrementButton.click()
         assertEquals(totalCountTextView.text, "Number of results: 0")
-    }
-
-    companion object {
-        private const val TIMEOUT = 5000L
-        private const val TEXT_OF_TO_DETAILS_BUTTON = "to details"
-        private const val DECREMENT_BUTTON_ID = "decrementButton"
-        private const val INCREMENT_BUTTON_ID = "incrementButton"
-        private const val TOTAL_TEXT_VIEW_ID = "totalCountTextView"
     }
 }

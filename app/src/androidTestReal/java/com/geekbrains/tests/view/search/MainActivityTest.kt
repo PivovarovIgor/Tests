@@ -9,6 +9,7 @@ import androidx.test.platform.app.InstrumentationRegistry.getInstrumentation
 import androidx.test.uiautomator.By
 import androidx.test.uiautomator.UiDevice
 import androidx.test.uiautomator.Until.*
+import com.geekbrains.tests.*
 import org.junit.Assert.*
 import org.junit.Before
 import org.junit.Test
@@ -79,15 +80,5 @@ class MainActivityTest {
 
         uiDevice.executeShellCommand("svc wifi enable")
         uiDevice.executeShellCommand("svc data enable")
-    }
-
-    companion object {
-        private const val TIMEOUT = 5000L
-        private const val SEARCH_EDIT_TEXT_ID = "searchEditText"
-        private const val TOTAL_TEXT_VIEW_ID = "totalCountTextView"
-        private const val TEXT_OF_SEARCH_BUTTON = "to search"
-        private const val TEXT_OF_TO_DETAILS_BUTTON = "to details"
-        private const val START_TEXT_OF_TOTAL_TEXT = "Number of results:"
-        private const val SEARCHING_TEXT = "kotlin"
     }
 }
