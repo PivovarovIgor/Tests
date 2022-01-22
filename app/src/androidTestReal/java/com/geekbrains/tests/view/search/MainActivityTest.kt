@@ -43,7 +43,7 @@ class MainActivityTest {
     fun search_positive() {
         val textEdit = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT_ID))
         textEdit.text = SEARCHING_TEXT
-        val searchButton = uiDevice.findObject(By.text(TEXT_OF_SEARCH_BUTTON))
+        val searchButton = uiDevice.findObject(By.res(packageName, TO_SEARCH_BUTTON_ID))
         searchButton.click()
         val result = uiDevice.wait(findObject(By.textStartsWith(START_TEXT_OF_TOTAL_TEXT)), TIMEOUT)
         assertNotNull(result)
@@ -53,13 +53,14 @@ class MainActivityTest {
     fun check_equals_count_found_positive() {
         val textEdit = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT_ID))
         textEdit.text = SEARCHING_TEXT
-        val searchButton = uiDevice.findObject(By.text(TEXT_OF_SEARCH_BUTTON))
+        Thread.sleep(1000)
+        val searchButton = uiDevice.findObject(By.res(packageName, TO_SEARCH_BUTTON_ID))
         searchButton.click()
         val totalResult =
             uiDevice.wait(findObject(By.textStartsWith(START_TEXT_OF_TOTAL_TEXT)), TIMEOUT)
         val textCountResults = totalResult.text
         assertNotNull(textCountResults)
-        val toDetailsButton = uiDevice.findObject(By.text(TEXT_OF_TO_DETAILS_BUTTON))
+        val toDetailsButton = uiDevice.findObject(By.res(packageName, TO_DETAILS_BUTTON_ID))
         toDetailsButton.clickAndWait(newWindow(), TIMEOUT)
         val totalDetails = uiDevice.findObject(By.res(packageName, TOTAL_TEXT_VIEW_ID))
         assertEquals(textCountResults, totalDetails.text)
@@ -73,7 +74,7 @@ class MainActivityTest {
 
         val editText = uiDevice.findObject(By.res(packageName, SEARCH_EDIT_TEXT_ID))
         editText.text = SEARCHING_TEXT
-        val buttonFind = uiDevice.findObject(By.text(TEXT_OF_SEARCH_BUTTON))
+        val buttonFind = uiDevice.findObject(By.res(packageName, TO_SEARCH_BUTTON_ID))
         buttonFind.click()
 
         assertFalse(uiDevice.hasObject(By.textStartsWith(START_TEXT_OF_TOTAL_TEXT)))
